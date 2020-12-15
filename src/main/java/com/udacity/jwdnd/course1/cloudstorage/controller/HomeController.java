@@ -35,13 +35,22 @@ public class HomeController {
         if(note.getNoteid() == null){
             Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
             note.setUserid(userIdOfCurrentUser);
-            notesService.createNote(note);
+            if(notesService.createNote(note) > 0) {
+                return "redirect:/result/createnote/success";
+            }
+            else {
+                return "redirect:/result/createnote/failure";
+            }
         }
         else {
-            notesService.updateNote(note);
+            if(notesService.updateNote(note) > 0) {
+                return "redirect:/result/updatenote/" + note.getNoteid() + "/success";
+            }
+            else {
+                return "redirect:/result/updatenote" + note.getNoteid() + "/failure";
+            }
         }
 
-        return "redirect:/result";
     }
 
 }
