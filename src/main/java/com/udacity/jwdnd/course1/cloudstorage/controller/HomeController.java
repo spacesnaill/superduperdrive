@@ -1,6 +1,5 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
-import com.udacity.jwdnd.course1.cloudstorage.model.NoteForm;
 import com.udacity.jwdnd.course1.cloudstorage.model.Notes;
 import com.udacity.jwdnd.course1.cloudstorage.services.NotesService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
@@ -31,6 +30,7 @@ public class HomeController {
     }
 
     @PostMapping
+    @RequestMapping("/home/notes")
     public String postNotes(Authentication authentication, Notes note, Model model ){
         if(note.getNoteid() == null){
             Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
