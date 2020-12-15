@@ -23,4 +23,8 @@ public class NotesService {
         return notesMapper.insertNote(note);
     }
 
+    public int updateNote(Notes note) {
+        return notesMapper.updateNote(note);
+    }
+
 }

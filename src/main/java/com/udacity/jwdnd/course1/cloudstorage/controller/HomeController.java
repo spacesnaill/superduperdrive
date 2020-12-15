@@ -32,9 +32,14 @@ public class HomeController {
 
     @PostMapping
     public String postNotes(Authentication authentication, Notes note, Model model ){
-        Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
-        note.setUserid(userIdOfCurrentUser);
-        notesService.createNote(note);
+        if(note.getNoteid() == null){
+            Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
+            note.setUserid(userIdOfCurrentUser);
+            notesService.createNote(note);
+        }
+        else {
+            notesService.updateNote(note);
+        }
 
         return "redirect:/result";
     }

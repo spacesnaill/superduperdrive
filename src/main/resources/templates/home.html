@@ -102,7 +102,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="#" method="POST" th:action="@{/home}" th:object="${notes}">
-                                            <input type="hidden" name="noteId" id="note-id">
+                                            <input th:field="*{noteid}" type="hidden" name="noteId" id="note-id">
                                             <div class="form-group">
                                                 <label for="note-title" class="col-form-label">Title</label>
                                                 <input th:field="*{notetitle}" type="text" name="noteTitle" class="form-control" id="note-title" maxlength="20" required>
