@@ -35,15 +35,15 @@ public class ResultController {
     }
 
     @GetMapping
-    @RequestMapping("/result/createnote/success")
-    public String createNoteSuccessView(Model model) {
+    @RequestMapping(value={"/result/createnote/success", "/result/createcredential/success"})
+    public String createSuccessView(Model model) {
         model.addAttribute("resultState", true);
         return "result";
     }
 
     @GetMapping
-    @RequestMapping("/result/createnote/failure")
-    public String createNoteFailureView(Model model) {
+    @RequestMapping(value={"/result/createnote/failure", "/result/createcredential/failure"})
+    public String createFailureView(Model model) {
         model.addAttribute("resultState", false);
         return "result";
     }

@@ -57,4 +57,28 @@ public class HomeController {
         }
     }
 
+    @PostMapping
+    @RequestMapping("/home/credentials")
+    public String postCredentials(Authentication authentication, Credentials credential, Model model) {
+        if(credential.getCredentialid() == null){
+            Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
+            credential.setUserid(userIdOfCurrentUser);
+            if(credentialsService.createCredential(credential) > 0) {
+                return "redirect:/result/createcredential/success";
+            }
+            else {
+                return "redirect:/result/createcredential/failure";
+            }
+        }
+        else {
+            return "redirect:/result";
+//            if(credentialsService.updateCredential(credential) > 0) {
+//                return "redirect:/result/updatecredential/" + credential.getCredentialid() + "/success";
+//            }
+//            else {
+//                return "redirect:/result/updatecredential" + credential.getCredentialid() + "/failure";
+//            }
+        }
+    }
+
 }
