@@ -41,6 +41,15 @@ public class CredentialsService {
         return credentialsMapper.insertCredential(credential);
     }
 
+    public int updateCredential(CredentialsForm credential) {
+        String encodedKey = createEncodedKey();
+        credential.setKey(encodedKey);
+
+        credential.setPassword(encryptionService.encryptValue(credential.getDecryptedPassword(), encodedKey));
+
+        return credentialsMapper.updateCredential(credential);
+    }
+
     private String createEncodedKey() {
         SecureRandom random = new SecureRandom();
         byte[] key = new byte[16];

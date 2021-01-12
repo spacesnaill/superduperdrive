@@ -49,9 +49,16 @@ public class ResultController {
     }
 
     @GetMapping
-    @RequestMapping("/result/updatenote/{id}/success")
-    public String updateNoteSuccessView(@PathVariable("id") int id, Model model) {
+    @RequestMapping(value={"/result/updatenote/{id}/success", "/result/updatecredential/{id}/success"})
+    public String updateSuccessView(@PathVariable("id") int id, Model model) {
         model.addAttribute("resultState", true);
+        return "result";
+    }
+
+    @GetMapping
+    @RequestMapping(value={"/result/updatenote/{id}/failure", "/result/updatecredential/{id}/failure"})
+    public String updateFailureView(@PathVariable("id") int id, Model model) {
+        model.addAttribute("resultState", false);
         return "result";
     }
 }

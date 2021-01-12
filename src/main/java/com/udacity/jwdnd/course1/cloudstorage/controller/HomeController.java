@@ -72,13 +72,12 @@ public class HomeController {
             }
         }
         else {
-            return "redirect:/result";
-//            if(credentialsService.updateCredential(credential) > 0) {
-//                return "redirect:/result/updatecredential/" + credential.getCredentialid() + "/success";
-//            }
-//            else {
-//                return "redirect:/result/updatecredential" + credential.getCredentialid() + "/failure";
-//            }
+            if(credentialsService.updateCredential(credentialsForm) > 0) {
+                return "redirect:/result/updatecredential/" + credentialsForm.getCredentialid() + "/success";
+            }
+            else {
+                return "redirect:/result/updatecredential/" + credentialsForm.getCredentialid() + "/failure";
+            }
         }
     }
 
