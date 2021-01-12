@@ -2,9 +2,11 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialsMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credentials;
+import com.udacity.jwdnd.course1.cloudstorage.model.CredentialsForm;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -19,15 +21,22 @@ public class CredentialsService {
         this.encryptionService = encryptionService;
     }
 
-    public List<Credentials> getCredentialsByUserId(Integer userId) {
-        return credentialsMapper.getCredentialsByUserId(userId);
+    public List<CredentialsForm> getCredentialsByUserId(Integer userId) {
+        List<CredentialsForm> credentialsForms = new ArrayList<CredentialsForm>();
+
+        List<Credentials> credentialsList = credentialsMapper.getCredentialsByUserId(userId);
+        for(Credentials credential : credentialsList) {
+            credentialsForms.add(new CredentialsForm(credential.getCredentialid(), credential.getUrl(), credential.getUsername(), credential.getKey(), credential.getPassword(), credential.getUserid() ,encryptionService.decryptValue(credential.getPassword(), credential.getKey())));
+        }
+
+        return credentialsForms;
     }
 
-    public int createCredential(Credentials credential) {
+    public int createCredential(CredentialsForm credential) {
         String encodedKey = createEncodedKey();
         credential.setKey(encodedKey);
 
-        credential.setPassword(encryptionService.encryptValue(credential.getPassword(), encodedKey));
+        credential.setPassword(encryptionService.encryptValue(credential.getDecryptedPassword(), encodedKey));
 
         return credentialsMapper.insertCredential(credential);
     }

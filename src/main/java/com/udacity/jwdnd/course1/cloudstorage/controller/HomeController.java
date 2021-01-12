@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credentials;
+import com.udacity.jwdnd.course1.cloudstorage.model.CredentialsForm;
 import com.udacity.jwdnd.course1.cloudstorage.model.Notes;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialsService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NotesService;
@@ -26,7 +27,7 @@ public class HomeController {
     }
 
     @GetMapping
-    public String homeView(Notes notes, Credentials credentials, Authentication authentication, Model model) {
+    public String homeView(Notes notes, CredentialsForm credentialsForm, Authentication authentication, Model model) {
         Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
         model.addAttribute("noteList", notesService.getNotesByUserId(userIdOfCurrentUser));
         model.addAttribute("credentialsList", credentialsService.getCredentialsByUserId(userIdOfCurrentUser));
@@ -59,11 +60,11 @@ public class HomeController {
 
     @PostMapping
     @RequestMapping("/home/credentials")
-    public String postCredentials(Authentication authentication, Credentials credential, Model model) {
-        if(credential.getCredentialid() == null){
+    public String postCredentials(Authentication authentication, CredentialsForm credentialsForm, Model model) {
+        if(credentialsForm.getCredentialid() == null){
             Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
-            credential.setUserid(userIdOfCurrentUser);
-            if(credentialsService.createCredential(credential) > 0) {
+            credentialsForm.setUserid(userIdOfCurrentUser);
+            if(credentialsService.createCredential(credentialsForm) > 0) {
                 return "redirect:/result/createcredential/success";
             }
             else {
