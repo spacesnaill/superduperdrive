@@ -24,3 +24,11 @@ hs_err_pid*
 
 # target folders
 target/
+target
+/target
+/target/
+*.class
+
+# garbage from the IDE
+.idea/
+.eclipse
