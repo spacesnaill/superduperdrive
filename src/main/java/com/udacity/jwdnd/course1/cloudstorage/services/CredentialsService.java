@@ -50,6 +50,10 @@ public class CredentialsService {
         return credentialsMapper.updateCredential(credential);
     }
 
+    public int deleteCredential(Integer credentialid){
+        return credentialsMapper.deleteCredential(credentialid);
+    }
+
     private String createEncodedKey() {
         SecureRandom random = new SecureRandom();
         byte[] key = new byte[16];
