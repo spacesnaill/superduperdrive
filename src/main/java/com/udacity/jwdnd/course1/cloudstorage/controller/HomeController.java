@@ -33,14 +33,16 @@ public class HomeController {
     }
 
     @GetMapping
-    public String homeView(Notes notes, CredentialsForm credentialsForm, Authentication authentication, Model model) {
+    public String homeView(Notes notes, CredentialsForm credentialsForm, Files files, Authentication authentication, Model model) {
         Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
 
         model.addAttribute("noteList", notesService.getNotesByUserId(userIdOfCurrentUser));
         model.addAttribute("credentialsList", credentialsService.getCredentialsByUserId(userIdOfCurrentUser));
+        model.addAttribute("filesList", filesService.getFilesByUserId(userIdOfCurrentUser));
 
         model.addAttribute(credentialsForm);
         model.addAttribute(notes);
+        model.addAttribute(files);
 
         return "home";
     }
@@ -103,7 +105,7 @@ public class HomeController {
         Integer userId = userService.getUser(authentication.getName()).getUserid();
         String fileSize = Long.toString(fileUpload.getSize());
 
-        Files newFile = new Files(null, fileUpload.getName(), fileUpload.getContentType(), fileSize, userId, fileUpload.getBytes());
+        Files newFile = new Files(null, fileUpload.getOriginalFilename(), fileUpload.getContentType(), fileSize, userId, fileUpload.getBytes());
 
         if(filesService.createFile(newFile) > 0) {
             return "redirect:/result/createfile/success";
