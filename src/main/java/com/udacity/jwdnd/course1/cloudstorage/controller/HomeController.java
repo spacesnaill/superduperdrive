@@ -46,6 +46,12 @@ public class HomeController {
     }
 
     @PostMapping
+    @RequestMapping("/logout")
+    public String logout(Authentication authentication) {
+        return "login";
+    }
+
+    @PostMapping
     @RequestMapping("/home/notes")
     public String postNotes(Authentication authentication, Notes note, Model model ){
         if(note.getNoteid() == null){
