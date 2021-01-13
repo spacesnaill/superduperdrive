@@ -2,17 +2,20 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credentials;
 import com.udacity.jwdnd.course1.cloudstorage.model.CredentialsForm;
+import com.udacity.jwdnd.course1.cloudstorage.model.Files;
 import com.udacity.jwdnd.course1.cloudstorage.model.Notes;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialsService;
+import com.udacity.jwdnd.course1.cloudstorage.services.FilesService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NotesService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 @Controller
 @RequestMapping(value={"/home", "/"})
@@ -20,11 +23,13 @@ public class HomeController {
     private final NotesService notesService;
     private final UserService userService;
     private final CredentialsService credentialsService;
+    private final FilesService filesService;
 
-    public HomeController(NotesService notesService, UserService userService, CredentialsService credentialsService){
+    public HomeController(NotesService notesService, UserService userService, CredentialsService credentialsService, FilesService filesService){
         this.notesService = notesService;
         this.userService = userService;
         this.credentialsService = credentialsService;
+        this.filesService = filesService;
     }
 
     @GetMapping
@@ -83,6 +88,22 @@ public class HomeController {
             else {
                 return "redirect:/result/updatecredential/" + credentialsForm.getCredentialid() + "/failure";
             }
+        }
+    }
+
+    @PostMapping
+    @RequestMapping("/home/file-upload")
+    public String postFiles(Authentication authentication, @RequestParam("fileUpload") MultipartFile fileUpload, Model model) throws IOException {
+        Integer userId = userService.getUser(authentication.getName()).getUserid();
+        String fileSize = Long.toString(fileUpload.getSize());
+
+        Files newFile = new Files(null, fileUpload.getName(), fileUpload.getContentType(), fileSize, userId, fileUpload.getBytes());
+
+        if(filesService.createFile(newFile) > 0) {
+            return "redirect:/result/createfile/success";
+        }
+        else {
+            return "redirect:/result/createfile/failure";
         }
     }
 

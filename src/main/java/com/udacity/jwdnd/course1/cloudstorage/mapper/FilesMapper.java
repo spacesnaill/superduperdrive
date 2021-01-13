@@ -12,7 +12,7 @@ public interface FilesMapper {
     List<Files> getFilesByUserId(Integer userid);
 
     @Insert("INSERT INTO FILES (filename, contenttype, filesize, userid, filedata) VALUES(#{filename}, #{contenttype}, #{filesize}, #{userid}, #{filedata})")
-    @Options(useGeneratedKeys = true, keyProperty = "fileid")
+    @Options(useGeneratedKeys = true, keyProperty = "fileId")
     int insertFile(Files file);
 
     @Delete("DELETE FROM FILES WHERE FILEID=#{fileid}")
