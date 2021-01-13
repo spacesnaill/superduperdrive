@@ -14,13 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SignupController {
     private final UserService userService;
 
+    private static final String SIGN_UP = "signup";
+
     public SignupController(UserService userService){
         this.userService = userService;
     }
 
     @GetMapping
     public String signupView() {
-        return "signup";
+        return SIGN_UP;
     }
 
     @PostMapping
@@ -44,6 +46,6 @@ public class SignupController {
             model.addAttribute("signupError", signupError);
         }
 
-        return "signup";
+        return SIGN_UP;
     }
 }
