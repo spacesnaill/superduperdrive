@@ -20,6 +20,11 @@ public class FilesService {
         return filesMapper.getFilesByUserId(userId);
     }
 
+    public Files getFileByFileId(Integer fileId) {
+        List<Files> files = filesMapper.getFilesByFileId(fileId);
+        return files.get(0);
+    }
+
     public int createFile(Files file) {
         return  filesMapper.insertFile(file);
     }
