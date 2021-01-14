@@ -25,6 +25,10 @@ public class FilesService {
         return files.get(0);
     }
 
+    public List<String> getFileNamesByUserId(Integer userId) {
+        return filesMapper.getFileNamesByUserId(userId);
+    }
+
     public int createFile(Files file) {
         return  filesMapper.insertFile(file);
     }
@@ -32,4 +36,5 @@ public class FilesService {
     public int deleteFile(Integer fileid) {
         return filesMapper.deleteFile(fileid);
     }
+
 }

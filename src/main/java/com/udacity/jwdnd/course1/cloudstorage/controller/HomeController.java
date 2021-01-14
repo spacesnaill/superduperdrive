@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 @Controller
 @RequestMapping(value={"/home", "/"})
@@ -103,6 +104,10 @@ public class HomeController {
     @RequestMapping("/home/file-upload")
     public String postFiles(Authentication authentication, @RequestParam("fileUpload") MultipartFile fileUpload, Model model) throws IOException {
         Integer userId = userService.getUser(authentication.getName()).getUserid();
+        if(filesService.getFileNamesByUserId(userId).size() > 0) {
+            return "redirect:/result/createfile/failure/invalid-name";
+        }
+
         String fileSize = Long.toString(fileUpload.getSize());
 
         Files newFile = new Files(null, fileUpload.getOriginalFilename(), fileUpload.getContentType(), fileSize, userId, fileUpload.getBytes());

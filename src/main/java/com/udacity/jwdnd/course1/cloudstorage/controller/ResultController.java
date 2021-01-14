@@ -59,7 +59,7 @@ public class ResultController {
     }
 
     @GetMapping
-    @RequestMapping(value={"/result/createnote/failure", "/result/createcredential/failure", "/result/createfile/failure"})
+    @RequestMapping(value={"/result/createnote/failure", "/result/createcredential/failure", "/result/createfile/failure/*"})
     public String createFailureView(Model model) {
         model.addAttribute(RESULT_STATE, false);
         return RESULT;
