@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialsService;
+import com.udacity.jwdnd.course1.cloudstorage.services.FilesService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NotesService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,12 +14,14 @@ public class ResultController {
 
     private final NotesService notesService;
     private final CredentialsService credentialsService;
+    private final FilesService filesService;
     private static final  String RESULT_STATE = "resultState";
     private static final String RESULT = "result";
 
-    public ResultController(NotesService notesService, CredentialsService credentialsService) {
+    public ResultController(NotesService notesService, CredentialsService credentialsService, FilesService filesService) {
         this.credentialsService = credentialsService;
         this.notesService = notesService;
+        this.filesService = filesService;
     }
 
     @GetMapping
@@ -43,6 +46,18 @@ public class ResultController {
     @RequestMapping("/result/deletecredential/{id}")
     public String deleteCredentialResultView(@PathVariable("id") int id, Model model) {
         if(credentialsService.deleteCredential(id) > 0){
+            model.addAttribute(RESULT_STATE, true);
+        }
+        else {
+            model.addAttribute(RESULT_STATE, false);
+        }
+        return RESULT;
+    }
+
+    @GetMapping
+    @RequestMapping("/result/deletefile/{id}")
+    public String deleteFileResultView(@PathVariable("id") int id, Model model) {
+        if(filesService.deleteFile(id) > 0) {
             model.addAttribute(RESULT_STATE, true);
         }
         else {
