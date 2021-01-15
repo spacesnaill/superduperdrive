@@ -65,9 +65,11 @@ public class ResultController {
     }
 
     @GetMapping
-    @RequestMapping("/result/deletefile/{id}")
-    public String deleteFileResultView(@PathVariable("id") int id, Model model) {
-        if(filesService.deleteFile(id) > 0) {
+    @RequestMapping("/result/deletefile/{fileId}")
+    public String deleteFileResultView(Authentication authentication, @PathVariable("fileId") int fileId, Model model) {
+        Integer userId = userService.getUser(authentication.getName()).getUserid();
+
+        if(filesService.doesUserOwnFile(userId, fileId) && filesService.deleteFile(fileId) > 0) {
             model.addAttribute(RESULT_STATE, true);
         }
         else {
