@@ -36,6 +36,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/home", true);
 
         http.logout().logoutUrl("/logout");
+
+        http.sessionManagement().maximumSessions(1);
     }
 
 }
