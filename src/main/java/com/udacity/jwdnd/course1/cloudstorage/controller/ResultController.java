@@ -51,9 +51,11 @@ public class ResultController {
     }
 
     @GetMapping
-    @RequestMapping("/result/deletecredential/{id}")
-    public String deleteCredentialResultView(@PathVariable("id") int id, Model model) {
-        if(credentialsService.deleteCredential(id) > 0){
+    @RequestMapping("/result/deletecredential/{credentialId}")
+    public String deleteCredentialResultView(Authentication authentication, @PathVariable("credentialId") int credentialId, Model model) {
+        Integer userId = userService.getUser(authentication.getName()).getUserid();
+
+        if(credentialsService.doesUserOwnCredential(userId, credentialId) && credentialsService.deleteCredential(credentialId) > 0){
             model.addAttribute(RESULT_STATE, true);
         }
         else {

@@ -3,6 +3,7 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialsMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credentials;
 import com.udacity.jwdnd.course1.cloudstorage.model.CredentialsForm;
+import com.udacity.jwdnd.course1.cloudstorage.model.Notes;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -56,6 +57,12 @@ public class CredentialsService {
 
     public int deleteCredential(Integer credentialid){
         return credentialsMapper.deleteCredential(credentialid);
+    }
+
+    public boolean doesUserOwnCredential(Integer userId, Integer credentialId) {
+        Credentials credentialWithCredentialId = getCredentialsByCredentialId(credentialId).get(0);
+
+        return credentialWithCredentialId.getUserid().equals(userId);
     }
 
     private String createEncodedKey() {
