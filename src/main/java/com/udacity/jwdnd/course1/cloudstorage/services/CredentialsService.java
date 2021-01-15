@@ -32,6 +32,10 @@ public class CredentialsService {
         return credentialsForms;
     }
 
+    public List<Credentials> getCredentialsByCredentialId(Integer credentialId) {
+        return credentialsMapper.getCredentialsByCredentialId(credentialId);
+    }
+
     public int createCredential(CredentialsForm credential) {
         String encodedKey = createEncodedKey();
         credential.setKey(encodedKey);
