@@ -33,4 +33,10 @@ public class NotesService {
         return notesMapper.deleteNote(noteId);
     }
 
+    public boolean doesUserOwnNote(Integer userId, Integer noteId) {
+        Notes noteWithNoteId = getNotesByNoteId(noteId).get(0);
+
+        return noteWithNoteId.getUserid().equals(userId);
+    }
+
 }

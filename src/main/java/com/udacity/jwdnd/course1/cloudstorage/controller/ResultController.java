@@ -3,6 +3,8 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialsService;
 import com.udacity.jwdnd.course1.cloudstorage.services.FilesService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NotesService;
+import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +17,15 @@ public class ResultController {
     private final NotesService notesService;
     private final CredentialsService credentialsService;
     private final FilesService filesService;
+    private final UserService userService;
     private static final  String RESULT_STATE = "resultState";
     private static final String RESULT = "result";
 
-    public ResultController(NotesService notesService, CredentialsService credentialsService, FilesService filesService) {
+    public ResultController(NotesService notesService, CredentialsService credentialsService, FilesService filesService, UserService userService) {
         this.credentialsService = credentialsService;
         this.notesService = notesService;
         this.filesService = filesService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -30,10 +34,14 @@ public class ResultController {
         return RESULT;
     }
 
+    // TODO - set up the mappers to take both the userid and the resource id so only the user associated with that resource can delete it
+
     @GetMapping
-    @RequestMapping("/result/deletenote/{id}")
-    public String deleteNoteResultView(@PathVariable("id") int id, Model model) {
-        if(notesService.deleteNote(id) > 0) {
+    @RequestMapping("/result/deletenote/{noteId}")
+    public String deleteNoteResultView(Authentication authentication, @PathVariable("noteId") int noteId, Model model) {
+        Integer userId = userService.getUser(authentication.getName()).getUserid();
+
+        if(notesService.doesUserOwnNote(userId, noteId) && notesService.deleteNote(noteId) > 0) {
             model.addAttribute(RESULT_STATE, true);
         }
         else {
