@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.FilesMapper;
+import com.udacity.jwdnd.course1.cloudstorage.model.Credentials;
 import com.udacity.jwdnd.course1.cloudstorage.model.Files;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,12 @@ public class FilesService {
 
     public int deleteFile(Integer fileid) {
         return filesMapper.deleteFile(fileid);
+    }
+
+    public boolean doesUserOwnFile(Integer userId, Integer fileId) {
+        Files fileWithFileId = getFileByFileId(fileId);
+
+        return fileWithFileId.getUserid().equals(userId);
     }
 
 }

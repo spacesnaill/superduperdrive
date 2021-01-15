@@ -32,16 +32,18 @@ public class FileController {
     @RequestMapping(value={"/file/{fileId}/{fileName}"})
     public ResponseEntity<Resource> getFile(@PathVariable("fileId") int fileId, Authentication authentication, Model model){
         Integer userIdOfCurrentUser = userService.getUser(authentication.getName()).getUserid();
-        Files retrievedFile = filesService.getFileByFileId(fileId);
-        HttpHeaders headers = new HttpHeaders();
 
-        if(retrievedFile.getUserid() != userIdOfCurrentUser ){
+        if(filesService.doesUserOwnFile(userIdOfCurrentUser, fileId)){
+            Files retrievedFile = filesService.getFileByFileId(fileId);
+            HttpHeaders headers = new HttpHeaders();
+
+            ByteArrayResource resource = new ByteArrayResource(retrievedFile.getFiledata());
+
+            return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        }
+        else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-
-        ByteArrayResource resource = new ByteArrayResource(retrievedFile.getFiledata());
-
-        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
     }
 }
