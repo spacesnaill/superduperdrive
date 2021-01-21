@@ -187,8 +187,10 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
-		Assertions.assertEquals(newNoteTitle, driver.findElement(By.xpath("//tbody/tr/th")).getText());
-		Assertions.assertEquals(newNoteDescription, driver.findElement(By.xpath("//td[2]")).getText());
+		String noteTitleXpath = String.format("//tbody/tr/th[contains(.,'%s')]", newNoteTitle);
+		String noteDescriptionXpath = String.format("//td[2][contains(.,'%s')]", newNoteDescription);
+		Assertions.assertEquals(newNoteTitle, driver.findElement(By.xpath(noteTitleXpath)).getText());
+		Assertions.assertEquals(newNoteDescription, driver.findElement(By.xpath(noteDescriptionXpath)).getText());
 	}
 
 	@Test
@@ -210,6 +212,12 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
+		// Verify the note exists now
+		String noteTitleXpath = String.format("//tbody/tr/th[contains(.,'%s')]", noteTitle);
+		String noteDescriptionXpath = String.format("//td[2][contains(.,'%s')]", noteDescription);
+		Assertions.assertEquals(noteTitle, driver.findElement(By.xpath(noteTitleXpath)).getText());
+		Assertions.assertEquals(noteDescription, driver.findElement(By.xpath(noteDescriptionXpath)).getText());
+
 		WebElement deleteNoteButton = driver.findElement(By.xpath("//a[contains(@href, '/result/deletenote/1')]"));
 		deleteNoteButton.click();
 
@@ -219,7 +227,11 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
-		Assertions.assertEquals(0, driver.findElements(By.xpath("//tbody/tr/th")).size());
+		// Note should no longer exist, as it has been deleted
+		// findElements will not throw an error like findElement does when it can't find something
+		// so we can check the list to see if it is length 0, which means it couldn't find any matching elements
+		Assertions.assertEquals(0, driver.findElements(By.xpath(noteTitleXpath)).size());
+		Assertions.assertEquals(0, driver.findElements(By.xpath(noteDescriptionXpath)).size());
 	}
 
 	// Adding, editing, and deleting credentials tests
