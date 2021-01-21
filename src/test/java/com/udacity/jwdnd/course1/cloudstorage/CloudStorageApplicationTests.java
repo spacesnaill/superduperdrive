@@ -176,7 +176,7 @@ class CloudStorageApplicationTests {
 
 		noteTitleInput.clear();
 		noteDescriptionInput.clear();
-		
+
 		noteTitleInput.sendKeys(newNoteTitle);
 		noteDescriptionInput.sendKeys(newNoteDescription);
 		noteDescriptionInput.submit();
@@ -189,6 +189,37 @@ class CloudStorageApplicationTests {
 
 		Assertions.assertEquals(newNoteTitle, driver.findElement(By.xpath("//tbody/tr/th")).getText());
 		Assertions.assertEquals(newNoteDescription, driver.findElement(By.xpath("//td[2]")).getText());
+	}
+
+	@Test
+	public void userDeletesNote() {
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		signUp();
+		signIn();
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToNotesTab();
+
+		String noteTitle = "Note";
+		String noteDescription = "Hello World";
+
+		createNote(noteTitle, noteDescription);
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToNotesTab();
+
+		WebElement deleteNoteButton = driver.findElement(By.xpath("//a[contains(@href, '/result/deletenote/1')]"));
+		deleteNoteButton.click();
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToNotesTab();
+
+		Assertions.assertEquals(0, driver.findElements(By.xpath("//tbody/tr/th")).size());
 	}
 
 	// Adding, editing, and deleting credentials tests
