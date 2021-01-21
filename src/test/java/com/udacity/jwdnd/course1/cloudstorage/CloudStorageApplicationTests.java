@@ -121,7 +121,7 @@ class CloudStorageApplicationTests {
 
 	// Adding, editing, and deleting notes tests
 	@Test
-	public void notesTests() {
+	public void userCreatesNewNote() {
 		WebDriverWait wait = new WebDriverWait(driver, 10);
 		signUp();
 		signIn();
