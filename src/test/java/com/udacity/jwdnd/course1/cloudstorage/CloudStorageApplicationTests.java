@@ -25,10 +25,11 @@ class CloudStorageApplicationTests {
 	private final static String userName = "Janedoe";
 	private final static String password = "password";
 
+	private final static int webDriverWaitTimeout = 3;
+
 	@BeforeAll
 	static void beforeAll() {
 		WebDriverManager.chromedriver().setup();
-
 	}
 
 	@BeforeEach
@@ -38,6 +39,7 @@ class CloudStorageApplicationTests {
 		options.addArguments("--headless");
 
 		this.driver = new ChromeDriver(options);
+		driver.manage().deleteAllCookies();
 	}
 
 	@AfterEach
@@ -65,7 +67,7 @@ class CloudStorageApplicationTests {
 	@Test
 	public void userSignUpAndLogIn() {
 		driver.get("http://localhost:" + this.port + "/login");
-		WebDriverWait wait = new WebDriverWait(driver, 3);
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
 
 		// Go to sign up page
 		WebElement signUpButton = driver.findElement(By.id("signup-link"));
@@ -121,12 +123,17 @@ class CloudStorageApplicationTests {
 
 	// Adding, editing, and deleting notes tests
 	@Test
-	public void userCreatesNewNote() {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+	public void noteInteractions() {
 		signUp();
 		signIn();
-		driver.get("http://localhost:" + this.port + "/home");
 
+		userCreatesNewNote();
+		userEditsNote();
+		userDeletesNote();
+	}
+
+	private void userCreatesNewNote() {
+		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
 		String noteTitle = "Note";
@@ -144,24 +151,10 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals(noteDescription, driver.findElement(By.xpath("//td[2]")).getText());
 	}
 
-	@Test
-	public void userEditsNote() {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
-		signUp();
-		signIn();
+	private void userEditsNote() {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
 		driver.get("http://localhost:" + this.port + "/home");
 
-		switchToNotesTab();
-
-		String noteTitle = "Note";
-		String noteDescription = "Hello World";
-
-		createNote(noteTitle, noteDescription);
-
-		Assertions.assertEquals("Result", driver.getTitle());
-		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
-
-		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
 		WebElement editButton = driver.findElement(By.xpath("//button[contains(.,'Edit')]"));
@@ -193,16 +186,12 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals(newNoteDescription, driver.findElement(By.xpath(noteDescriptionXpath)).getText());
 	}
 
-	@Test
-	public void userDeletesNote() {
-		WebDriverWait wait = new WebDriverWait(driver, 10);
-		signUp();
-		signIn();
+	private void userDeletesNote() {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
-		String noteTitle = "Note";
-		String noteDescription = "Hello World";
+		String noteTitle = "Groceries";
+		String noteDescription = "Carrots, chocolate, eggs";
 
 		createNote(noteTitle, noteDescription);
 
@@ -215,10 +204,11 @@ class CloudStorageApplicationTests {
 		// Verify the note exists now
 		String noteTitleXpath = String.format("//tbody/tr/th[contains(.,'%s')]", noteTitle);
 		String noteDescriptionXpath = String.format("//td[2][contains(.,'%s')]", noteDescription);
+		System.out.println(driver.findElement(By.xpath(noteTitleXpath)).getText());
 		Assertions.assertEquals(noteTitle, driver.findElement(By.xpath(noteTitleXpath)).getText());
 		Assertions.assertEquals(noteDescription, driver.findElement(By.xpath(noteDescriptionXpath)).getText());
 
-		WebElement deleteNoteButton = driver.findElement(By.xpath("//a[contains(@href, '/result/deletenote/1')]"));
+		WebElement deleteNoteButton = driver.findElement(By.xpath("//a[contains(@href, '/result/deletenote/2')]"));
 		deleteNoteButton.click();
 
 		Assertions.assertEquals("Result", driver.getTitle());
@@ -227,6 +217,7 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
+		System.out.println(driver.getPageSource());
 		// Note should no longer exist, as it has been deleted
 		// findElements will not throw an error like findElement does when it can't find something
 		// so we can check the list to see if it is length 0, which means it couldn't find any matching elements
@@ -235,7 +226,39 @@ class CloudStorageApplicationTests {
 	}
 
 	// Adding, editing, and deleting credentials tests
+	@Test
+	public void userCreatesNewCredential() {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+		signUp();
+		signIn();
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
 
+		String credentialUrl = "https://www.google.com";
+		String credentialUsername = "funnyfish";
+		String credentialPassword = "Mx3@R6C9jt62";
+
+		String credentialUrlXpath = String.format("//table[@id='credentialTable']/tbody/tr/th[contains(.,'%s')]", credentialUrl);
+		String credentialUsernameXpath = String.format("//table[@id='credentialTable']/tbody/tr/td[2][contains(.,'%s')]", credentialUsername);
+
+		createCredential(credentialUrl, credentialUsername, credentialPassword);
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
+		Assertions.assertEquals(credentialUrl, driver.findElement(By.xpath(credentialUrlXpath)).getText());
+		Assertions.assertEquals(credentialUsername, driver.findElement(By.xpath(credentialUsernameXpath)).getText());
+		Assertions.assertNotNull(driver.findElement(By.xpath("//td[3]")).getText());
+
+		driver.findElement(By.xpath("//table[@id='credentialTable']/tbody/tr/td/button[contains(.,'Edit')]")).click();
+		WebElement credentialUrlInput = driver.findElement(By.id("credential-password"));
+		wait.until(ExpectedConditions.visibilityOf(credentialUrlInput));
+		String credentialPasswordDecrypted = credentialUrlInput.getAttribute("value");
+
+		Assertions.assertEquals(credentialPassword, credentialPasswordDecrypted);
+	}
 
 	// Helper Functions
 	private void signUp() {
@@ -266,7 +289,7 @@ class CloudStorageApplicationTests {
 	}
 
 	private void switchToNotesTab() {
-		WebDriverWait wait = new WebDriverWait(driver, 3);
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
 
 		// Click on the Notes tab button
 		WebElement notesNavButton = driver.findElement(By.id("nav-notes-tab"));
@@ -279,7 +302,7 @@ class CloudStorageApplicationTests {
 	}
 
 	private void createNote(String title, String description) {
-		WebDriverWait wait = new WebDriverWait(driver, 3);
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
 
 		WebElement addNoteButton = driver.findElement(By.id("add-note"));
 		addNoteButton.click();
@@ -295,7 +318,33 @@ class CloudStorageApplicationTests {
 	}
 
 	private void switchToCredentialsTab() {
+		WebDriverWait wait  = new WebDriverWait(driver, webDriverWaitTimeout);
 
+		// Click on the Credentials tab button
+		WebElement credentialsNavButton = driver.findElement(By.id("nav-credentials-tab"));
+		wait.until(ExpectedConditions.visibilityOf(credentialsNavButton));
+		credentialsNavButton.click();
 
+		// Verify we've switched tabs and the elements within are visible
+		WebElement addCredentialButton = driver.findElement(By.id("add-credential"));
+		wait.until(ExpectedConditions.visibilityOf(addCredentialButton));
+	}
+
+	private void createCredential(String url, String username, String password) {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+
+		WebElement addCredentialButton = driver.findElement(By.id("add-credential"));
+		addCredentialButton.click();
+
+		WebElement credentialUrlInput = driver.findElement(By.id("credential-url"));
+		WebElement credentialUsernameInput = driver.findElement(By.id("credential-username"));
+		WebElement credentialPassword = driver.findElement(By.id("credential-password"));
+
+		wait.until(ExpectedConditions.visibilityOf(credentialUrlInput));
+
+		credentialUrlInput.sendKeys(url);
+		credentialUsernameInput.sendKeys(username);
+		credentialPassword.sendKeys(password);
+		credentialPassword.submit();
 	}
 }
