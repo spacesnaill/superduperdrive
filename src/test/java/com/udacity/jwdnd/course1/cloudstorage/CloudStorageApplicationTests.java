@@ -129,20 +129,10 @@ class CloudStorageApplicationTests {
 
 		switchToNotesTab();
 
-		WebElement addNoteButton = driver.findElement(By.id("add-note"));
-		addNoteButton.click();
-
 		String noteTitle = "Note";
 		String noteDescription = "Hello World";
 
-		WebElement noteTitleInput = driver.findElement(By.id("note-title"));
-		WebElement noteDescriptionInput = driver.findElement(By.id("note-description"));
-
-		wait.until(ExpectedConditions.visibilityOf(noteTitleInput));
-
-		noteTitleInput.sendKeys(noteTitle);
-		noteDescriptionInput.sendKeys(noteDescription);
-		noteDescriptionInput.submit();
+		createNote(noteTitle, noteDescription);
 
 		Assertions.assertEquals("Result", driver.getTitle());
 		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
@@ -152,6 +142,53 @@ class CloudStorageApplicationTests {
 		switchToNotesTab();
 		Assertions.assertEquals(noteTitle, driver.findElement(By.xpath("//tbody/tr/th")).getText());
 		Assertions.assertEquals(noteDescription, driver.findElement(By.xpath("//td[2]")).getText());
+	}
+
+	@Test
+	public void userEditsNote() {
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		signUp();
+		signIn();
+		driver.get("http://localhost:" + this.port + "/home");
+
+		switchToNotesTab();
+
+		String noteTitle = "Note";
+		String noteDescription = "Hello World";
+
+		createNote(noteTitle, noteDescription);
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToNotesTab();
+
+		WebElement editButton = driver.findElement(By.xpath("//button[contains(.,'Edit')]"));
+		editButton.click();
+
+		String newNoteTitle = "Edited Note Title";
+		String newNoteDescription = "I edited the description!";
+
+		WebElement noteTitleInput = driver.findElement(By.id("note-title"));
+		WebElement noteDescriptionInput = driver.findElement(By.id("note-description"));
+		wait.until(ExpectedConditions.visibilityOf(noteTitleInput));
+
+		noteTitleInput.clear();
+		noteDescriptionInput.clear();
+		
+		noteTitleInput.sendKeys(newNoteTitle);
+		noteDescriptionInput.sendKeys(newNoteDescription);
+		noteDescriptionInput.submit();
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToNotesTab();
+
+		Assertions.assertEquals(newNoteTitle, driver.findElement(By.xpath("//tbody/tr/th")).getText());
+		Assertions.assertEquals(newNoteDescription, driver.findElement(By.xpath("//td[2]")).getText());
 	}
 
 	// Adding, editing, and deleting credentials tests
@@ -198,8 +235,23 @@ class CloudStorageApplicationTests {
 		wait.until(ExpectedConditions.visibilityOf(addNoteButton));
 	}
 
-	private void switchToCredentialsTab() {
+	private void createNote(String title, String description) {
 		WebDriverWait wait = new WebDriverWait(driver, 3);
+
+		WebElement addNoteButton = driver.findElement(By.id("add-note"));
+		addNoteButton.click();
+
+		WebElement noteTitleInput = driver.findElement(By.id("note-title"));
+		WebElement noteDescriptionInput = driver.findElement(By.id("note-description"));
+
+		wait.until(ExpectedConditions.visibilityOf(noteTitleInput));
+
+		noteTitleInput.sendKeys(title);
+		noteDescriptionInput.sendKeys(description);
+		noteDescriptionInput.submit();
+	}
+
+	private void switchToCredentialsTab() {
 
 
 	}
