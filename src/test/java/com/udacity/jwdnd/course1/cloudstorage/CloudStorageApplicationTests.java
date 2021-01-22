@@ -123,7 +123,7 @@ class CloudStorageApplicationTests {
 
 	// Adding, editing, and deleting notes tests
 	@Test
-	public void noteInteractions() {
+	public void noteInteractionTests() {
 		signUp();
 		signIn();
 
@@ -227,10 +227,25 @@ class CloudStorageApplicationTests {
 
 	// Adding, editing, and deleting credentials tests
 	@Test
-	public void userCreatesNewCredential() {
-		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+	public void credentialInteractionTests() {
 		signUp();
 		signIn();
+
+		userCreatesNewCredential();
+		userEditsCredential();
+		userDeletesCredential();
+	}
+
+	private void userEditsCredential() {
+
+	}
+
+	private void userDeletesCredential() {
+
+	}
+
+	private void userCreatesNewCredential() {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToCredentialsTab();
 
