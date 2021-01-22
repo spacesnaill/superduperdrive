@@ -217,7 +217,6 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
 
-		System.out.println(driver.getPageSource());
 		// Note should no longer exist, as it has been deleted
 		// findElements will not throw an error like findElement does when it can't find something
 		// so we can check the list to see if it is length 0, which means it couldn't find any matching elements
@@ -228,22 +227,26 @@ class CloudStorageApplicationTests {
 	// Adding, editing, and deleting credentials tests
 	@Test
 	public void credentialInteractionTests() {
-		signUp();
-		signIn();
-
-		userCreatesNewCredential();
-		userEditsCredential();
-		userDeletesCredential();
-	}
-
-	private void userEditsCredential() {
-		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
-		driver.get("http://localhost:" + this.port + "/home");
-		switchToCredentialsTab();
+		String credentialUrl = "https://www.google.com";
+		String credentialUsername = "funnyfish";
+		String credentialPassword = "Mx3@R6C9jt62";
 
 		String newCredentialUrl = "http://www.yahoo.com";
 		String newCredentialUsername = "newusername";
 		String newCredentialPassword = "dskfshdivxocj93";
+
+		signUp();
+		signIn();
+
+		userCreatesNewCredential(credentialUrl, credentialUsername, credentialPassword);
+		userEditsCredential(newCredentialUrl, newCredentialUsername, newCredentialPassword);
+		userDeletesCredential(newCredentialUrl, newCredentialUsername);
+	}
+
+	private void userEditsCredential(String newCredentialUrl, String newCredentialUsername, String newCredentialPassword) {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
 
 		String credentialUrlXpath = String.format("//table[@id='credentialTable']/tbody/tr/th[contains(.,'%s')]", newCredentialUrl);
 		String credentialUsernameXpath = String.format("//table[@id='credentialTable']/tbody/tr/td[2][contains(.,'%s')]", newCredentialUsername);
@@ -282,18 +285,32 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals(newCredentialPassword, credentialPasswordDecrypted);
 	}
 
-	private void userDeletesCredential() {
-
-	}
-
-	private void userCreatesNewCredential() {
-		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+	private void userDeletesCredential(String credentialUrl, String credentialUsername) {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToCredentialsTab();
 
-		String credentialUrl = "https://www.google.com";
-		String credentialUsername = "funnyfish";
-		String credentialPassword = "Mx3@R6C9jt62";
+		String credentialUrlXpath = String.format("//table[@id='credentialTable']/tbody/tr/th[contains(.,'%s')]", credentialUrl);
+		String credentialUsernameXpath = String.format("//table[@id='credentialTable']/tbody/tr/td[2][contains(.,'%s')]", credentialUsername);
+
+		Assertions.assertEquals(credentialUrl, driver.findElement(By.xpath(credentialUrlXpath)).getText());
+		Assertions.assertEquals(credentialUsername, driver.findElement(By.xpath(credentialUsernameXpath)).getText());
+
+		driver.findElement(By.xpath("//table[@id='credentialTable']/tbody/tr/td/a[contains(.,'Delete')]")).click();
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
+
+		Assertions.assertEquals(0, driver.findElements(By.xpath(credentialUrlXpath)).size());
+		Assertions.assertEquals(0, driver.findElements(By.xpath(credentialUsernameXpath)).size());
+	}
+
+	private void userCreatesNewCredential(String credentialUrl, String credentialUsername, String credentialPassword) {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
 
 		String credentialUrlXpath = String.format("//table[@id='credentialTable']/tbody/tr/th[contains(.,'%s')]", credentialUrl);
 		String credentialUsernameXpath = String.format("//table[@id='credentialTable']/tbody/tr/td[2][contains(.,'%s')]", credentialUsername);
