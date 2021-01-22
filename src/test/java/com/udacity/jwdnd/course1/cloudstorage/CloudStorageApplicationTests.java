@@ -124,20 +124,26 @@ class CloudStorageApplicationTests {
 	// Adding, editing, and deleting notes tests
 	@Test
 	public void noteInteractionTests() {
+		String noteTitle = "Note";
+		String noteDescription = "Hello World";
+
+		String newNoteTitle = "Edited Note Title";
+		String newNoteDescription = "I edited the description!";
+
+		String noteForDeletionTitle = "Groceries";
+		String noteForDeletionDescription = "Carrots, chocolate, eggs";
+
 		signUp();
 		signIn();
 
-		userCreatesNewNote();
-		userEditsNote();
-		userDeletesNote();
+		userCreatesNewNote(noteTitle, noteDescription);
+		userEditsNote(newNoteTitle, newNoteDescription);
+		userDeletesNote(noteForDeletionTitle, noteForDeletionDescription);
 	}
 
-	private void userCreatesNewNote() {
+	private void userCreatesNewNote(String noteTitle, String noteDescription) {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
-
-		String noteTitle = "Note";
-		String noteDescription = "Hello World";
 
 		createNote(noteTitle, noteDescription);
 
@@ -151,7 +157,7 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals(noteDescription, driver.findElement(By.xpath("//td[2]")).getText());
 	}
 
-	private void userEditsNote() {
+	private void userEditsNote(String newNoteTitle, String newNoteDescription) {
 		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
 		driver.get("http://localhost:" + this.port + "/home");
 
@@ -159,9 +165,6 @@ class CloudStorageApplicationTests {
 
 		WebElement editButton = driver.findElement(By.xpath("//button[contains(.,'Edit')]"));
 		editButton.click();
-
-		String newNoteTitle = "Edited Note Title";
-		String newNoteDescription = "I edited the description!";
 
 		WebElement noteTitleInput = driver.findElement(By.id("note-title"));
 		WebElement noteDescriptionInput = driver.findElement(By.id("note-description"));
@@ -186,12 +189,9 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals(newNoteDescription, driver.findElement(By.xpath(noteDescriptionXpath)).getText());
 	}
 
-	private void userDeletesNote() {
+	private void userDeletesNote(String noteTitle, String noteDescription) {
 		driver.get("http://localhost:" + this.port + "/home");
 		switchToNotesTab();
-
-		String noteTitle = "Groceries";
-		String noteDescription = "Carrots, chocolate, eggs";
 
 		createNote(noteTitle, noteDescription);
 
