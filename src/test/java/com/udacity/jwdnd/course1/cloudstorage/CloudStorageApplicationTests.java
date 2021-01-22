@@ -237,7 +237,49 @@ class CloudStorageApplicationTests {
 	}
 
 	private void userEditsCredential() {
+		WebDriverWait wait = new WebDriverWait(driver, webDriverWaitTimeout);
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
 
+		String newCredentialUrl = "http://www.yahoo.com";
+		String newCredentialUsername = "newusername";
+		String newCredentialPassword = "dskfshdivxocj93";
+
+		String credentialUrlXpath = String.format("//table[@id='credentialTable']/tbody/tr/th[contains(.,'%s')]", newCredentialUrl);
+		String credentialUsernameXpath = String.format("//table[@id='credentialTable']/tbody/tr/td[2][contains(.,'%s')]", newCredentialUsername);
+
+		WebElement credentialUrlInput = driver.findElement(By.id("credential-url"));
+		WebElement credentialUsernameInput = driver.findElement(By.id("credential-username"));
+		WebElement credentialPasswordInput = driver.findElement(By.id("credential-password"));
+
+		driver.findElement(By.xpath("//table[@id='credentialTable']/tbody/tr/td/button[contains(.,'Edit')]")).click();
+		wait.until(ExpectedConditions.visibilityOf(credentialUrlInput));
+
+		credentialUrlInput.clear();
+		credentialUsernameInput.clear();
+		credentialPasswordInput.clear();
+
+		credentialUrlInput.sendKeys(newCredentialUrl);
+		credentialUsernameInput.sendKeys(newCredentialUsername);
+		credentialPasswordInput.sendKeys(newCredentialPassword);
+		credentialPasswordInput.submit();
+
+		Assertions.assertEquals("Result", driver.getTitle());
+		Assertions.assertEquals("Success", driver.findElement(By.tagName("h1")).getText());
+
+		driver.get("http://localhost:" + this.port + "/home");
+		switchToCredentialsTab();
+
+		Assertions.assertEquals(newCredentialUrl, driver.findElement(By.xpath(credentialUrlXpath)).getText());
+		Assertions.assertEquals(newCredentialUsername, driver.findElement(By.xpath(credentialUsernameXpath)).getText());
+		Assertions.assertNotNull(driver.findElement(By.xpath("//td[3]")).getText());
+
+		credentialPasswordInput = driver.findElement(By.id("credential-password"));
+		driver.findElement(By.xpath("//table[@id='credentialTable']/tbody/tr/td/button[contains(.,'Edit')]")).click();
+		wait.until(ExpectedConditions.visibilityOf(credentialPasswordInput));
+		String credentialPasswordDecrypted = credentialPasswordInput.getAttribute("value");
+
+		Assertions.assertEquals(newCredentialPassword, credentialPasswordDecrypted);
 	}
 
 	private void userDeletesCredential() {
@@ -268,9 +310,9 @@ class CloudStorageApplicationTests {
 		Assertions.assertNotNull(driver.findElement(By.xpath("//td[3]")).getText());
 
 		driver.findElement(By.xpath("//table[@id='credentialTable']/tbody/tr/td/button[contains(.,'Edit')]")).click();
-		WebElement credentialUrlInput = driver.findElement(By.id("credential-password"));
-		wait.until(ExpectedConditions.visibilityOf(credentialUrlInput));
-		String credentialPasswordDecrypted = credentialUrlInput.getAttribute("value");
+		WebElement credentialPasswordInput = driver.findElement(By.id("credential-password"));
+		wait.until(ExpectedConditions.visibilityOf(credentialPasswordInput));
+		String credentialPasswordDecrypted = credentialPasswordInput.getAttribute("value");
 
 		Assertions.assertEquals(credentialPassword, credentialPasswordDecrypted);
 	}
