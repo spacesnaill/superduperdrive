@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping(value={"/home", "/"})
@@ -100,8 +101,13 @@ public class HomeController {
     @PostMapping
     @RequestMapping("/home/file-upload")
     public String postFiles(Authentication authentication, @RequestParam("fileUpload") MultipartFile fileUpload, Model model) throws IOException {
+        if(fileUpload.getSize() == 0) {
+            return "redirect:/result/createfile/failure/no-file-selected";
+        }
+
         Integer userId = userService.getUser(authentication.getName()).getUserid();
-        if(filesService.getFileNamesByUserId(userId).size() > 0) {
+        List<String> filesNamesByUserId = filesService.getFileNamesByUserId(userId);
+        if(filesNamesByUserId.contains(fileUpload.getOriginalFilename())) {
             return "redirect:/result/createfile/failure/invalid-name";
         }
 
